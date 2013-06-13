@@ -22,7 +22,7 @@ class SessionMiddleware(object):
         except AttributeError:
             pass
         else:
-            if accessed:
+            if (accessed and request.COOKIES.get(settings.SESSION_COOKIE_NAME, None)) or modified:
                 patch_vary_headers(response, ('Cookie',))
             if modified or settings.SESSION_SAVE_EVERY_REQUEST:
                 if request.session.get_expire_at_browser_close():
