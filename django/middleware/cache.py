@@ -139,6 +139,10 @@ class FetchFromCacheMiddleware(object):
             request._cache_update_cache = False
             return None # Don't bother checking the cache.
 
+        if self.cache_anonymous_only and request.user.is_authenticated():
+            request._cache_update_cache = False
+            return None # Do not serve from cache for authenticated users.
+
         # try and get the cached GET response
         cache_key = get_cache_key(request, self.key_prefix, 'GET', cache=self.cache)
         if cache_key is None:
