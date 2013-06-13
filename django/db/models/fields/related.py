@@ -851,8 +851,18 @@ class ManyRelatedObjectsDescriptor(object):
             raise AttributeError("Cannot set values on a ManyToManyField which specifies an intermediary model. Use %s.%s's Manager instead." % (opts.app_label, opts.object_name))
 
         manager = self.__get__(instance)
-        manager.clear()
-        manager.add(*value)
+        value_org = manager.get_query_set()
+
+        if len(value)==0 and len(value_org)>0 :
+            manager.clear()
+        else:
+            v_add = [ v.pk for v in value if not v in value_org]
+            v_remove = [ v.pk for v in value_org if not v in value]
+           
+            if v_add:
+                manager.add(*value.filter(pk__in = v_add))
+            if v_remove:
+                manager.remove(*value_org.filter(pk__in = v_remove))
 
 
 class ReverseManyRelatedObjectsDescriptor(object):
@@ -908,8 +918,18 @@ class ReverseManyRelatedObjectsDescriptor(object):
             raise AttributeError("Cannot set values on a ManyToManyField which specifies an intermediary model.  Use %s.%s's Manager instead." % (opts.app_label, opts.object_name))
 
         manager = self.__get__(instance)
-        manager.clear()
-        manager.add(*value)
+        value_org = manager.get_query_set()
+
+        if len(value)==0 and len(value_org)>0 :
+            manager.clear()
+        else:
+            v_add = [ v.pk for v in value if not v in value_org]
+            v_remove = [ v.pk for v in value_org if not v in value]
+           
+            if v_add:
+                manager.add(*value.filter(pk__in = v_add))
+            if v_remove:
+                manager.remove(*value_org.filter(pk__in = v_remove))
 
 
 class ManyToOneRel(object):
