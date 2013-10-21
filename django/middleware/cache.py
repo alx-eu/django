@@ -143,6 +143,11 @@ class FetchFromCacheMiddleware(object):
             request._cache_update_cache = False
             return None # Do not serve from cache for authenticated users.
 
+        # Do not use cache for SSL.
+        if request.is_secure():
+            request._cache_update_cache = False
+            return None
+
         # try and get the cached GET response
         cache_key = get_cache_key(request, self.key_prefix, 'GET', cache=self.cache)
         if cache_key is None:
